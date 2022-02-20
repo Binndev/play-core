@@ -1,12 +1,16 @@
 const bucket = new WeakMap();
 let activeEffect;
+const effectStack = [];
 
 // 注册副作用函数
 exports.effect = fn => {
     const effectFn = () => {
         cleanup(effectFn); //清除相关依赖
         activeEffect = effectFn;
+        effectStack.push(effectFn);
         fn();
+        effectStack.pop();
+        activeEffect = effectStack[effectStack.length - 1];
     }
     effectFn.deps = [];
     effectFn();
